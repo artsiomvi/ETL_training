@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: introduction to Amazon infrastructure
+
+Parameters:
+  ExpirationInDays:
+    Description: Storage period in days
+    Type: Number
+    Default: 3
+
+Resources:
+  s3inputstorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3inputstorage-delivery
+      LifecycleConfiguration:
+        Rules:
+          - Id: Delete3Days
+            Status: Enabled
+            ExpirationInDays: !Ref ExpirationInDays
+  s3reportstorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3inputstorage-delivery
+      LifecycleConfiguration:
+        Rules:
+          - Id: Delete3Days
+            Status: Enabled
+            ExpirationInDays: !Ref ExpirationInDays
+  s3contentstorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3inputstorage-delivery
+      LifecycleConfiguration:
+        Rules:
+          - Id: Delete3Days
+            Status: Enabled
+            ExpirationInDays: !Ref ExpirationInDays
