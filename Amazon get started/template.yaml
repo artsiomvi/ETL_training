@@ -11,7 +11,7 @@ Resources:
   s3inputstorage:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: s3inputstorage-delivery
+      BucketName: s3inputstorage-delivery-2005
       LifecycleConfiguration:
         Rules:
           - Id: Delete3Days
@@ -20,7 +20,7 @@ Resources:
   s3reportstorage:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: s3inputstorage-delivery
+      BucketName: s3reportstorage-delivery-2005
       LifecycleConfiguration:
         Rules:
           - Id: Delete3Days
@@ -29,7 +29,7 @@ Resources:
   s3contentstorage:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: s3inputstorage-delivery
+      BucketName: s3contentstorage-delivery-2005
       LifecycleConfiguration:
         Rules:
           - Id: Delete3Days

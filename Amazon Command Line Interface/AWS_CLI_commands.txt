@@ -1,0 +1,23 @@
+Check the list of the buckets via AWS CLI:
+aws s3 ls 
+
+Copy the files via CLI from your local machine to s3inputstorage-delivery:
+aws s3 cp C:\D\files\ s3://s3inputstorage-delivery-2005 --recursive
+
+Copy the files via CLI from s3inputstorage-delivery to s3contentstorage-delivery:
+aws s3 cp s3://s3inputstorage-delivery-2005 s3://s3contentstorage-delivery-2005 --recursive
+
+Copy the files via CLI from s3contentstorage-delivery to your local machine:
+aws s3 cp s3://s3contentstorage-delivery-2005 C:\D\files2\ --recursive
+
+Remove all the buckets via CLI: 
+aws s3 rm s3://s3inputstorage-delivery-2005 --recursive
+aws s3api delete-bucket --bucket s3inputstorage-delivery-2005 --region us-east-1
+
+aws s3api delete-bucket --bucket s3reportstorage-delivery-2005 --region us-east-1
+
+aws s3 rm s3://s3contentstorage-delivery-2005 --recursive
+aws s3api delete-bucket --bucket s3contentstorage-delivery-2005 --region us-east-1
+
+Run the CF for creating buckets via CLI: 
+aws --region us-east-1  cloudformation create-stack --stack-name delivery-test-2020 --template-body file://C:\D\template.yaml
