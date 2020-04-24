@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: introduction to Amazon infrastructure
+
+Parameters:
+  ExpirationInDays:
+    Description: Storage period in days
+    Type: Number
+    Default: 3
+
+Resources:
+  s3inputstorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3inputstorage-delivery-2005
+      InventoryConfigurations:
+        - Id: InventoryConfiguration
+          Destination:
+            BucketArn: arn:aws:s3:::s3reportstorage-delivery-2005
+            Format: ORC
+          Enabled: 'true'
+          IncludedObjectVersions: All
+          ScheduleFrequency: Daily
+      LifecycleConfiguration:
+        Rules:
+          - Id: Delete3Days
+            Status: Enabled
+            ExpirationInDays: !Ref ExpirationInDays
+    DependsOn: s3reportstorage
+    
+  s3reportstorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3reportstorage-delivery-2005
+      LifecycleConfiguration:
+        Rules:
+          - Id: Delete3Days
+            Status: Enabled
+            ExpirationInDays: !Ref ExpirationInDays
+            
+  ReportStorageBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref s3reportstorage
+      PolicyDocument:
+        Statement:
+        - Sid: InventoryBucketPolicy
+          Action: s3:PutObject
+          Resource: !Sub arn:aws:s3:::${s3reportstorage}/*
+          Effect: Allow
+          Principal:
+            Service: s3.amazonaws.com
+          Condition: 
+              StringEquals: 
+                s3:x-amz-acl: bucket-owner-full-control
