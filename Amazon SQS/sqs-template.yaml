@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: introduction to Amazon infrastructure
+
+Parameters:
+  ExpirationInDays:
+    Description: Storage period in days
+    Type: Number
+    Default: 3
+
+Resources:
+  queue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: etl-test-queue
+
+  queuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action:
+              - SQS:SendMessage
+            Resource: !GetAtt queue.Arn
+      Queues:
+        - !Ref queue
+    DependsOn: queue
+
+  s3contentstorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3contentstorage-delivery-2005
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: Medline/
+            Queue: !GetAtt queue.Arn
+      LifecycleConfiguration:
+        Rules:
+          - Id: Delete3Days
+            Status: Enabled
+            ExpirationInDays: !Ref ExpirationInDays
+    DependsOn: queuePolicy
