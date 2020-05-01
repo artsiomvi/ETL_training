@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template to create an EC2 instance and enable SSH
+
+Parameters:
+  KeyName:
+    Description: Name of SSH KeyPair
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Default: tststack
+
+Resources:
+  AppNode:
+    Type: 'AWS::EC2::Instance'
+    DependsOn: AppNodeSG
+    Properties:
+      InstanceType: t2.micro
+      SubnetId: subnet-a7d78cee
+      ImageId: ami-085925f297f89fce1
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - !GetAtt AppNodeSG.GroupId
+      SecurityGroups:
+        - !Ref AppNodeSG
+      UserData: !Base64
+        #!/bin/bash
+        sudo apt-get update -qq
+        sudo apt install docker.io -y
+        sudo systemctl start docker
+        sudo apt install -y mongodb
+      Tags:
+        - Key: Name
+          Value: My CF Instance
+
+  AppNodeSG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: TheTestSecurityGroup
+      VpcId: vpc-6358ee05
+      GroupDescription: enable access to node
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 27017
+          ToPort: 27017
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  InstanceID:
+    Description: The Instance ID
+    Value: !Ref AppNode
